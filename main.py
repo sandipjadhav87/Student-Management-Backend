@@ -80,4 +80,10 @@ def partial_update(id:int,student:Student):
     connection.commit()
     raise HTTPException(status_code=200,detail='Partially update successfully')
 
-
+@app.delete('/students/{id}')
+def delete_student_record(id:int):
+    cursor.execute('DELETE FROM students WHERE id=%s',(id,))
+    if(cursor.rowcount == 0):
+         raise HTTPException(status_code=404,detail='Invalid ID')
+    connection.commit()
+    raise HTTPException(status_code=200,detail='Record delete Successfully')
