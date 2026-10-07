@@ -1,0 +1,4 @@
+fastapi
+uvicorn
+pyhton-dotenv
+psycopg2-binary
