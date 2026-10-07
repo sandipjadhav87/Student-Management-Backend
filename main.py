@@ -1,14 +1,18 @@
 from fastapi import FastAPI,HTTPException   #not importing whole library, just FastAPI class
 import psycopg2
 from pydantic import BaseModel
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app=FastAPI()
 connection = psycopg2.connect(
-    host='localhost',
-    port='5432',
-    database='postgres',
-    user='postgres',
-    password='8767485861'
+    host=os.getenv('DB_HOST'),
+    port=os.getenv('DB_PORT'),
+    database=os.getenv('DB_DATABASE'),
+    user=os.getenv('DB_USER'),
+    password=os.getenv('DB_PASS')
 )
 cursor = connection.cursor()
 
@@ -80,6 +84,8 @@ def partial_update(id:int,student:Student):
     connection.commit()
     raise HTTPException(status_code=200,detail='Partially update successfully')
 
+
+#Delete student record
 @app.delete('/students/{id}')
 def delete_student_record(id:int):
     cursor.execute('DELETE FROM students WHERE id=%s',(id,))
