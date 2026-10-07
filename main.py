@@ -13,9 +13,9 @@ connection = psycopg2.connect(
 cursor = connection.cursor()
 
 class Student(BaseModel):
-    id: int
-    name: str
-    course: str
+    id: int = None
+    name: str = None
+    course: str = None
 
 #get all Students
 @app.get('/students')#@app is decorator and /student is api endpoint
@@ -55,3 +55,29 @@ def create_student_record(student: Student):
     except psycopg2.IntegrityError:
         connection.rollback()
         raise HTTPException(status_code=404,detail='Student id allready exist')
+
+#update student record
+@app.put('/students/{id}')
+def update_student_record(student:Student,id:int):
+    cursor.execute('UPDATE students SET id=%s, name=%s,course=%s WHERE id=%s',(student.id,student.name,student.course,id))
+    if(cursor.rowcount == 0):
+            raise HTTPException(status_code=404,detail='Invalid ID')
+    connection.commit()
+    raise HTTPException(status_code=200,detail='Student record update successfully')
+   
+
+#Partial Update 
+@app.patch('/students/{id}')
+def partial_update(id:int,student:Student):
+    if(student.id != None):
+        cursor.execute('UPDATE students SET id=%s WHERE id=%s',(student.id,id))
+    if(student.name != None):
+        cursor.execute('UPDATE students SET name=%s WHERE id=%s',(student.name,id))
+    if(student.course != None):
+        cursor.execute('UPDATE students SET course=%s WHERE id=%s',(student.course,id))
+    if(cursor.rowcount == 0):
+        raise HTTPException(status_code=404,detail='Invalid ID')
+    connection.commit()
+    raise HTTPException(status_code=200,detail='Partially update successfully')
+
+
